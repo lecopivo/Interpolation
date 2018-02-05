@@ -1,17 +1,16 @@
 #pragma once
 
+#include <tuple>
 #include <utility>
 
-template <class U, class... T>
-constexpr bool is_all_same() {
+template <class U, class... T> constexpr bool is_all_same() {
   return (std::is_same_v<U, T> && ... && true);
 }
 
 template <int I, typename... Ts>
 using getType = typename std::tuple_element<I, std::tuple<Ts...>>::type;
 
-template <int I, class... Ts>
-decltype(auto) get(Ts&&... ts) {
+template <int I, class... Ts> decltype(auto) get(Ts &&... ts) {
   return std::get<I>(std::forward_as_tuple(ts...));
 }
 
@@ -24,13 +23,10 @@ inline void static_for(Lambda const &f) {
   }
 }
 
-template <typename>
-struct ApplyNTimes_impl;
+template <typename> struct ApplyNTimes_impl;
 
-template <std::size_t... I>
-struct ApplyNTimes_impl<std::index_sequence<I...>> {
-  template <typename V, int N>
-  using type = V;
+template <std::size_t... I> struct ApplyNTimes_impl<std::index_sequence<I...>> {
+  template <typename V, int N> using type = V;
 
   template <template <typename...> typename T, typename V>
   using apply = T<type<V, I>...>;
