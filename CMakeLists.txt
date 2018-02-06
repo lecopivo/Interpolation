@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 
-set(CMAKE_CXX_STANDARD 17)
-# add_compile_options(-std=c++17) # sometimes the above does not work
+# set(CMAKE_CXX_STANDARD 17)
+add_compile_options(-std=c++1z) # sometimes the above does not work
 
 include_directories(${CMAKE_SOURCE_DIR}/src)
 
