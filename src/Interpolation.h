@@ -51,7 +51,6 @@ auto LinearInterpolation = [](auto &&fun, auto x) {
   int ix = (int)floor(x);
 
   return (wx != 0 ? wx * fun(ix + 1) : 0) + (wx != 1 ? (1 - wx) * fun(ix) : 0);
-
 };
 
 auto CubicInterpolation = [](auto &&fun, auto x) {

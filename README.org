@@ -1,0 +1,22 @@
+* Interpolation library
+
+  This library provides various interpolations such as piece-wise constant, linear or cubic interpolation. Right now the main feature is that it provides a function which takes bunch of one dimensional interpolations and creates an interpolation in arbitrary dimension.
+
+** One dimensional interpolation
+   
+   Assume we have a function =double fun(int i)= defined on integers and we want to extend this function to floating point numbers with piece-wise interpolation. This library provides a function object =LinearInterpolation=
+   #+BEGIN_SRC c++
+     auto LinearInterpolation = [](auto &&fun, auto x){
+       auto wx = x - floor(x);
+       int ix = (int)floor(x);
+  
+       return   wx * fun(ix + 1) + (1 - wx) * fun(ix);
+     }
+   #+END_SRC
+   =LinearInterpolation= is a callable object which accepts a function =fun=, which is assumed to be a function accepting a single integer, and floating point number =x= and return an interpolation of =fun= at point =x=. In general one dimensional interpolation is assumed to be in the following form
+   #+BEGIN_SRC c++
+     auto CustomInterpolation = [](auto &&fun, auto x) {
+       // some computation
+       return /*interpolated function value at x*/;
+     }
+   #+END_SRC
