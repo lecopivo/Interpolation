@@ -19,7 +19,8 @@ char const *help_message =
 
 using namespace std;
 
-void save_data(std::vector<double> x, std::vector<double> y, std::vector<double> data, std::string name) {
+void save_data(std::vector<double> x, std::vector<double> y,
+               std::vector<double> data, std::string name) {
   ofstream file;
   file.open(name.append(".dat"));
   for (int i = 0; i < x.size(); i++) {
@@ -70,6 +71,13 @@ int main() {
   std::vector<double> linear_y(M * M);
   std::vector<double> cubic_y(M * M);
 
+  auto constant_interpol =
+      InterpolationDimWise(ConstantInterpolation, ConstantInterpolation);
+  auto linear_interpol =
+      InterpolationDimWise(LinearInterpolation, LinearInterpolation);
+  auto cubic_interpol =
+      InterpolationDimWise(CubicInterpolation, CubicInterpolation);
+
   for (int i = 0; i < M; i++) {
     for (int j = 0; j < M; j++) {
       double x = xmin + i * dy;
@@ -81,15 +89,9 @@ int main() {
       interpol_y[i * M + j] = y;
 
       exact_y[i * M + j] = fun(x, y);
-      constant_y[i * M + j] =
-          InterpolationDimWiseN<ConstantInterpolation, 2>::interpolate(foo, ix,
-                                                                       iy);
-      linear_y[i * M + j] =
-          InterpolationDimWiseN<LinearInterpolation, 2>::interpolate(foo, ix,
-                                                                     iy);
-      cubic_y[i * M + j] =
-          InterpolationDimWiseN<CubicInterpolation, 2>::interpolate(foo, ix,
-                                                                    iy);
+      constant_y[i * M + j] = constant_interpol(foo, ix, iy);
+      linear_y[i * M + j] = linear_interpol(foo, ix, iy);
+      cubic_y[i * M + j] = cubic_interpol(foo, ix, iy);
     }
   }
 

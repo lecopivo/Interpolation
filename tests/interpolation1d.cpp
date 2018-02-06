@@ -62,9 +62,9 @@ int main() {
     interpol_x[i] = x;
 
     exact_y[i] = fun(x);
-    constant_y[i] = ConstantInterpolation::interpolate(foo, ix);
-    linear_y[i] = LinearInterpolation::interpolate(foo, ix);
-    cubic_y[i] = CubicInterpolation::interpolate(foo, ix);
+    constant_y[i] = ConstantInterpolation(foo, ix);
+    linear_y[i] = LinearInterpolation(foo, ix);
+    cubic_y[i] = CubicInterpolation(foo, ix);
   }
 
   save_data(interpol_x, exact_y, "exact1d");

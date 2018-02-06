@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "Interpolation2.h"
+#include "Interpolation.h"
 
 int main() {
 
