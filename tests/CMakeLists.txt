@@ -13,4 +13,3 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/interpolation2d.gnu
   ${CMAKE_CURRENT_BINARY_DIR}/interpolation2d.gnu COPYONLY)
 
 add_executable(sandbox sandbox.cpp)
-add_executable(madness madness.cpp)
