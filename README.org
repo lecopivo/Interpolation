@@ -20,3 +20,23 @@
        return /*interpolated function value at x*/;
      }
    #+END_SRC
+
+** Dimension wise interpolation
+
+   When we have function =double fun(int i, int j, int k)= and we want to preform a piece-wise linear interpolation at point =(x,y,z)= we can simply do
+   #+BEGIN_SRC c++
+     auto interpolation_pwl_3d = InterpolationDimWise(
+	 LinearInterpolation, LinearInterpolation, LinearInterpolation);
+
+     double interpolated_value = interpolation_pwl_3d(fun,x,y,z);
+   #+END_SRC
+
+   However, if we want to do linear interpolation over the first two dimensions and piece-wise constant 
+
+*** Interpolation order problem
+    
+    Right now the interpolations are done in order from the last dimension to the first. I.e. the function =InterpolationDimWise(InterpolationX,InterpolationY)= takes a function =fun(int i,int j)= and extends it to a =fun(double x, double y)= the two following schemetical steps
+      1. =fun(int i, int j)= --=InterpolationY=--> =fun(int i, double y)=
+      2. =fun(int i, double y)= --=InterpolationX=--> =fun(double x, double y)=
+	 
+    You can imagine that we could to the two dimensional interpolation in a reverse order, i.e. first interpolate over the first coordinate and then over the second. Sometimes this 

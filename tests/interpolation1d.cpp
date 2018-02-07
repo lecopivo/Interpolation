@@ -55,16 +55,20 @@ int main() {
   std::vector<double> linear_y(M);
   std::vector<double> cubic_y(M);
 
+  auto const_foo = ConstantInterpolation(foo);
+  auto linear_foo = LinearInterpolation(foo);
+  auto cubic_foo = CubicInterpolation(foo);
+
   for (int i = 0; i < M; i++) {
     double x = xmin + i * dy;
-    double ix = i*dy/dx;
+    double ix = i * dy / dx;
 
     interpol_x[i] = x;
 
     exact_y[i] = fun(x);
-    constant_y[i] = ConstantInterpolation(foo, ix);
-    linear_y[i] = LinearInterpolation(foo, ix);
-    cubic_y[i] = CubicInterpolation(foo, ix);
+    constant_y[i] = const_foo(ix);
+    linear_y[i] = linear_foo(ix);
+    cubic_y[i] = cubic_foo(ix);
   }
 
   save_data(interpol_x, exact_y, "exact1d");
