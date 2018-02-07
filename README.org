@@ -84,4 +84,15 @@
     Sometimes, when doing multidimensional interpolation is it important in which order is the interpolation done. 
 
 **** TODO Explain the problem of interpolation order
-**** TODO Implement custom interpolation order
+
+** Installation
+   
+** Examples
+
+* Goals
+** TODO Implement custom interpolation order for dimension wise interpolation
+** TODO Monotone cubic interpolation
+** TODO Lagrange interpolation
+** TODO Spline interpolation
+** TODO Currying ? 
+   Can we implement [[https://en.wikipedia.org/wiki/Currying][currying]] in some way? This might be useful when we need to compute =fun(x,y)= for many different =y= but fixed =x= and the interpolation over =y= has quite expensive precomputation.
