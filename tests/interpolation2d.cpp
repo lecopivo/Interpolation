@@ -72,11 +72,11 @@ int main() {
   std::vector<double> cubic_y(M * M);
 
   auto constant_foo =
-      InterpolationDimWise(foo, ConstantInterpolation, ConstantInterpolation);
+      InterpolationDimWise(ConstantInterpolation, ConstantInterpolation)(foo);
   auto linear_foo =
-      InterpolationDimWise(foo, LinearInterpolation, LinearInterpolation);
+      InterpolationDimWise(LinearInterpolation, LinearInterpolation)(foo);
   auto cubic_foo =
-      InterpolationDimWise(foo, CubicInterpolation, CubicInterpolation);
+      InterpolationDimWise(CubicInterpolation, CubicInterpolation)(foo);
 
   for (int i = 0; i < M; i++) {
     for (int j = 0; j < M; j++) {

@@ -33,10 +33,11 @@ auto InterpolationDimWise_impl(Fun fun, Interpolation... interpolation) {
   }
 }
 
-template <class Fun, class... Interpolation>
-auto InterpolationDimWise(Fun fun, Interpolation... interpolation) {
-
-  return InterpolationDimWise_impl<0>(fun, interpolation...);
+template <class... Interpolation>
+auto InterpolationDimWise(Interpolation... interpolation) {
+  return [=](auto fun) {
+    return InterpolationDimWise_impl<0>(fun, interpolation...);
+  };
 }
 
 auto ConstantInterpolation = [](auto fun) {
@@ -81,4 +82,3 @@ auto CubicInterpolation = [](auto fun) {
            (-2.0 * t3 + 3.0 * t2) * p1 + (t3 - t2) * m1;
   };
 };
-

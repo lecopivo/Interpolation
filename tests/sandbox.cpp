@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "Interpolation2.h"
+#include "Interpolation.h"
 
 int main() {
 
@@ -48,7 +48,7 @@ int main() {
   };
 
   auto linear_fun2d =
-      InterpolationDimWise(fun2d, LinearInterpolation, LinearInterpolation);
+    InterpolationDimWise(LinearInterpolation, LinearInterpolation)(fun2d);
 
   for (int i = 0; i <= 10; i++) {
     for (int j = 0; j <= 10; j++) {
@@ -83,7 +83,7 @@ int main() {
   };
 
   auto custom_fun2d =
-      InterpolationDimWise(fun2d, CustomInterpolation, CustomInterpolation);
+    InterpolationDimWise(CustomInterpolation, CustomInterpolation)(fun2d);
 
   for (int i = 0; i <= 10; i++) {
     for (int j = 0; j <= 10; j++) {
