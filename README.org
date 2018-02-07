@@ -52,20 +52,36 @@
 
 *** Dimension-wise interpolation
 
-    When we have function =double fun(int i, int j, int k)= and we want to preform a piece-wise linear interpolation at point =(x,y,z)= we can simply do
+    The library provides a functionality how to glue one dimensional interpolations to do multidimensional interpolation. We can take a function =double fun(int, int, int)= and turn it into a function =double fun(double,double,double)= by preforming linear interpolation on each argument. This is demonstrated with the following code:
     #+BEGIN_SRC c++
-     auto interpolation_pwl_3d = InterpolationDimWise(
-	 LinearInterpolation, LinearInterpolation, LinearInterpolation);
+      auto fun = [](int i, int j, int k) -> double {
+	return sin(i) + sin(j) + sin(k);
+      };
 
-     double interpolated_value = interpolation_pwl_3d(fun,x,y,z);
+      auto LinearInterpol3D = InterpolationDimWise(
+	  LinearInterpolation, LinearInterpolation, LinearInterpolation);
+
+      auto ifun = LinearInterpol3D(fun);
+
+      ifun(1.5, 2.1, 3.7);
     #+END_SRC
 
-    However, if we want to do linear interpolation over the first two dimensions and piece-wise constant 
+    We first define a function =double fun(int, int, int)=, then we create a three dimensional interpolation function, which can take a function on integers and with linear interpolation extends this function to floating points numbers. The third line actually extends =fun= from integer to floating point numbers and in the final step we just evaluate the function at a arbitrary point.
 
-*** Interpolation order problem
-    
-    Right now the interpolations are done in order from the last dimension to the first. I.e. the function =InterpolationDimWise(InterpolationX,InterpolationY)= takes a function =fun(int i,int j)= and extends it to a =fun(double x, double y)= the two following schemetical steps
-    1. =fun(int i, int j)= --=InterpolationY=--> =fun(int i, double y)=
-    2. =fun(int i, double y)= --=InterpolationX=--> =fun(double x, double y)=
+    We can also preform cubic interpolation on the first argument, linear on the second and constant(nearest neighbour) on the third one. 
+    #+BEGIN_SRC c++
+      auto Interpol3D = InterpolationDimWise(CubicInterpolation, LinearInterpolation,
+					     ConstantInterpolation);
 
-    You can imagine that we could to the two dimensional interpolation in a reverse order, i.e. first interpolate over the first coordinate and then over the second. Sometimes this 
+      auto ifun = Interpol3D(fun);
+
+      ifun(1.5, 2.1, 3.7);
+    #+END_SRC
+
+
+*** Interpolation order
+
+    Sometimes, when doing multidimensional interpolation is it important in which order is the interpolation done. 
+
+**** TODO Explain the problem of interpolation order
+**** TODO Implement custom interpolation order
