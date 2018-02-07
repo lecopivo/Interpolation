@@ -48,7 +48,7 @@ int main() {
   };
 
   auto linear_fun2d =
-    InterpolationDimWise(LinearInterpolation, LinearInterpolation)(fun2d);
+      InterpolationDimWise(LinearInterpolation, LinearInterpolation)(fun2d);
 
   for (int i = 0; i <= 10; i++) {
     for (int j = 0; j <= 10; j++) {
@@ -79,11 +79,11 @@ int main() {
 
       return (wx != 0 ? wx * fun(ix + 1) : 0) +
              (wx != 1 ? (1 - wx) * fun(ix) : 0);
-	   };
+    };
   };
 
   auto custom_fun2d =
-    InterpolationDimWise(CustomInterpolation, CustomInterpolation)(fun2d);
+      InterpolationDimWise(CustomInterpolation, CustomInterpolation)(fun2d);
 
   for (int i = 0; i <= 10; i++) {
     for (int j = 0; j <= 10; j++) {
@@ -94,6 +94,27 @@ int main() {
     }
     std::cout << std::endl;
   }
+
+  ////////////////////////////////////////////////////////////////
+
+  auto fun = [](int i, int j) {
+    std::cout << "fun(" << i << "," << j << ") called" << std::endl;
+    if (i <= 0 || j <= 0)
+      return -1.0;
+    return 1.0;
+  };
+
+  auto interpol01 =
+      InterpolationDimWise2<0, 1>(CubicInterpolation, LinearInterpolation);
+  auto interpol10 =
+      InterpolationDimWise2<1, 0>(CubicInterpolation, LinearInterpolation);
+
+  auto fun01 = interpol01(fun);
+  auto fun10 = interpol10(fun);
+
+  fun01(0.1,0.3);
+  std::cout << std::endl;
+  fun10(0.1,0.3);
 
   return 0;
 }

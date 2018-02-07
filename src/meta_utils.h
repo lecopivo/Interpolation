@@ -10,7 +10,7 @@ template <class U, class... T> constexpr bool is_all_same() {
 template <int I, typename... Ts>
 using getType = typename std::tuple_element<I, std::tuple<Ts...>>::type;
 
-template <int I, class... Ts> decltype(auto) get(Ts &&... ts) {
+template <int I, class... Ts> constexpr decltype(auto) get(Ts &&... ts) {
   return std::get<I>(std::forward_as_tuple(ts...));
 }
 

@@ -33,10 +33,34 @@ auto InterpolationDimWise_impl(Fun fun, Interpolation... interpolation) {
   }
 }
 
+template <int I, int... J, class Fun, class... Interpolation>
+auto InterpolationDimWise_impl2(Fun fun, Interpolation... interpolation) {
+
+  if constexpr (I == sizeof...(J)) {
+    return fun;
+  } else {
+    constexpr int K = get<I>(J...);
+    auto interpol = get<K>(interpolation...);
+    return InterpolationDimWise_impl2<I + 1,J ...>(
+        InterpolateNthArgument<K>(fun, interpol), interpolation...);
+  }
+}
+
 template <class... Interpolation>
 auto InterpolationDimWise(Interpolation... interpolation) {
   return [=](auto fun) {
     return InterpolationDimWise_impl<0>(fun, interpolation...);
+  };
+}
+
+template <int... J, class... Interpolation>
+auto InterpolationDimWise2(Interpolation... interpolation) {
+  static_assert(
+      sizeof...(J) == sizeof...(Interpolation),
+      "The number of interpolations must match the number order indices");
+
+  return [=](auto fun) {
+    return InterpolationDimWise_impl2<0, J...>(fun, interpolation...);
   };
 }
 
