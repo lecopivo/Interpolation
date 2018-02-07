@@ -4,39 +4,68 @@
 
 ** One dimensional interpolation
    
-   Assume we have a function =double fun(int i)= defined on integers and we want to extend this function to floating point numbers with piece-wise interpolation. This library provides a function object =LinearInterpolation=
+   Assume we have a function =double fun(int)= defined on integers and we want to extend this function to floating point numbers with piece-wise interpolation, i.e. to get =double fun(double)=. This library provides a function =LinearInterpolation=
    #+BEGIN_SRC c++
-     auto LinearInterpolation = [](auto &&fun, auto x){
-       auto wx = x - floor(x);
-       int ix = (int)floor(x);
-  
-       return   wx * fun(ix + 1) + (1 - wx) * fun(ix);
+     auto LinearInterpolation = [](auto fun) {
+       return [=](double x) {
+	 double wx = x - floor(x);
+	 int ix = (int)floor(x);
+
+	 return wx * fun(ix + 1) + (1 - wx) * fun(ix);
+       };
      }
    #+END_SRC
-   =LinearInterpolation= is a callable object which accepts a function =fun=, which is assumed to be a function accepting a single integer, and floating point number =x= and return an interpolation of =fun= at point =x=. In general one dimensional interpolation is assumed to be in the following form
+   =LinearInterpolation= takes a function, assuming it is of type =double fun(int)=, and return a function defined on floating point nubers: =double fun(double)=. The following code demonstrate a use:
    #+BEGIN_SRC c++
-     auto CustomInterpolation = [](auto &&fun, auto x) {
-       // some computation
-       return /*interpolated function value at x*/;
-     }
+     // define a function `fun :: int -> double`
+     auto fun = [](int i) -> double { return sin(i); }
+
+     // extend `fun` to `ifun :: double -> double`
+     auto ifun = LinearInterpolation(ifun);
+
+     ifun(1.5); // == 0.5*sin(1)+0.5*sin(2)
    #+END_SRC
 
-** Dimension wise interpolation
+*** General one dimensional interpolation   
 
-   When we have function =double fun(int i, int j, int k)= and we want to preform a piece-wise linear interpolation at point =(x,y,z)= we can simply do
-   #+BEGIN_SRC c++
+    A general one dimensional interpolation is assumed to be a function which takse a function =Float fun(Integer)= and generates =Float fun(Float)=, where =Float= is any floating point type and =Integer= is an integer like type. Therefore any one dimensional interpolation is assumed to be of type =Interpolation :: (Integer -> Float) -> (Float -> Float)=.
+
+*** Interpolation on containers
+
+    The resulting function of an interpolation holds a copy of the original function. Therefore, the function to be interpolated should be a light object if you want to avoid unnecessary copies. When you want to preform interpolation over a container such as a =std::vector= we recommend wrap the container into a lambda function which holds a reference to the container, this way you can also handle out of bound access. The following code demonstrates interpolation of a container:
+    #+BEGIN_SRC c++
+      std::vector<double> vec;
+
+      // initialize `vec`
+
+      auto fun = [&vec](int i) {
+	i = std::clamp(i, 0, vec.size() - 1);
+	return vec[i];
+      };
+
+      auto ifun = LinearInterpolation(fun);
+
+      ifun(1.5); // == 0.5*vec[1]+0.5*vec[2];
+    #+END_SRC
+
+** Multi-dimensional interpolation
+
+*** Dimension-wise interpolation
+
+    When we have function =double fun(int i, int j, int k)= and we want to preform a piece-wise linear interpolation at point =(x,y,z)= we can simply do
+    #+BEGIN_SRC c++
      auto interpolation_pwl_3d = InterpolationDimWise(
 	 LinearInterpolation, LinearInterpolation, LinearInterpolation);
 
      double interpolated_value = interpolation_pwl_3d(fun,x,y,z);
-   #+END_SRC
+    #+END_SRC
 
-   However, if we want to do linear interpolation over the first two dimensions and piece-wise constant 
+    However, if we want to do linear interpolation over the first two dimensions and piece-wise constant 
 
 *** Interpolation order problem
     
     Right now the interpolations are done in order from the last dimension to the first. I.e. the function =InterpolationDimWise(InterpolationX,InterpolationY)= takes a function =fun(int i,int j)= and extends it to a =fun(double x, double y)= the two following schemetical steps
-      1. =fun(int i, int j)= --=InterpolationY=--> =fun(int i, double y)=
-      2. =fun(int i, double y)= --=InterpolationX=--> =fun(double x, double y)=
-	 
+    1. =fun(int i, int j)= --=InterpolationY=--> =fun(int i, double y)=
+    2. =fun(int i, double y)= --=InterpolationX=--> =fun(double x, double y)=
+
     You can imagine that we could to the two dimensional interpolation in a reverse order, i.e. first interpolate over the first coordinate and then over the second. Sometimes this 
