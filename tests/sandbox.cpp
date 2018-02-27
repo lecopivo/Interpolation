@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "DomainInterpolation.h"
 #include "Interpolation.h"
 
 int main() {
@@ -112,9 +113,37 @@ int main() {
   auto fun01 = interpol01(fun);
   auto fun10 = interpol10(fun);
 
-  fun01(0.1,0.3);
+  fun01(0.1, 0.3);
   std::cout << std::endl;
-  fun10(0.1,0.3);
+  fun10(0.1, 0.3);
+
+  /////////////////////////////////////////////////////////////////
+
+  auto foo = [](double x, double y) {
+    return sin(3.0 * (x + 1)) / (x + 1) + cos(3 * y);
+  };
+
+  auto domain = [](int i, int j) -> bool {
+    if (i < 0 || j < 0)
+      return false;
+    if (i == 0 && j == 0)
+      return false;
+    return true;
+  };
+
+  auto interpolation =
+      InterpolationDimWise(LinearInterpolation, LinearInterpolation);
+  auto domInterpol = DomainInterpolation(interpolation, domain);
+
+  auto ifoo = domInterpol(foo);
+
+  std::cout << std::endl;
+  for (double x = 0.0; x <= 2.0; x += 0.2) {
+    for (double y = 0.0; y <= 2.0; y += 0.2) {
+      std::cout << ifoo(x, y) << "\t";
+    }
+    std::cout << std::endl;
+  }
 
   return 0;
 }

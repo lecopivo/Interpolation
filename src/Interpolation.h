@@ -7,11 +7,11 @@
 
 template <int I>
 auto InterpolateNthArgument = [](auto fun, auto interpolation) {
-  return [=](auto... x) {
+  return [=](auto... x) mutable {
     static_assert(std::is_invocable_v<decltype(fun), decltype(x)...>,
                   "Invalid aguments");
 
-    auto foo = [=](int i) mutable {
+    auto foo = [fun, x...](int i) mutable {
       get<I>(x...) = i;
       return fun(x...);
     };
@@ -41,7 +41,7 @@ auto InterpolationDimWise_impl2(Fun fun, Interpolation... interpolation) {
   } else {
     constexpr int K = get<I>(J...);
     auto interpol = get<K>(interpolation...);
-    return InterpolationDimWise_impl2<I + 1,J ...>(
+    return InterpolationDimWise_impl2<I + 1, J...>(
         InterpolateNthArgument<K>(fun, interpol), interpolation...);
   }
 }
@@ -65,24 +65,31 @@ auto InterpolationDimWise2(Interpolation... interpolation) {
 }
 
 auto ConstantInterpolation = [](auto fun) {
-  return [=](auto x) mutable {
+  using ReturnType = std::remove_reference_t<decltype(fun(0))>;
+  return [=](auto x) mutable -> ReturnType {
     int ix = (int)round(x);
     return fun(ix);
   };
 };
 
 auto LinearInterpolation = [](auto fun) {
-  return [=](auto x) mutable {
+  using ReturnType = std::remove_reference_t<decltype(fun(0))>;
+  return [=](auto x) mutable -> ReturnType {
     int ix = (int)floor(x);
     auto wx = x - ix;
 
-    return (wx != 0 ? wx * fun(ix + 1) : 0) +
-           (wx != 1 ? (1 - wx) * fun(ix) : 0);
+#warning The 0*ReturnType() is incorrect for Eigen types but it is so far the base I can do.
+    // A solution would be to define templated constexpr value Zero<Type> which
+    // would have specialization for Eigen types.
+    return (wx != 0 ? wx * fun(ix + 1) : 0 * ReturnType()) +
+           (wx != 1 ? (1 - wx) * fun(ix) : 0 * ReturnType());
+
   };
 };
 
 auto CubicInterpolation = [](auto fun) {
-  return [=](auto x) mutable {
+  using ReturnType = std::remove_reference_t<decltype(fun(0))>;
+  return [=](auto x) mutable -> ReturnType {
     // for explanation see https://en.wikipedia.org/wiki/Cubic_Hermite_spline
     int ix = (int)floor(x);
     auto wx = x - ix;
