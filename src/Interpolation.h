@@ -3,6 +3,7 @@
 #include <cmath>
 #include <type_traits>
 
+#include "ValueTraits.h"
 #include "meta_utils.h"
 
 template <int I>
@@ -65,24 +66,23 @@ auto InterpolationDimWise2(Interpolation... interpolation) {
 }
 
 auto ConstantInterpolation = [](auto fun) {
-  using ReturnType = std::remove_reference_t<decltype(fun(0))>;
-  return [=](auto x) mutable -> ReturnType {
+  using ValueType = std::remove_reference_t<decltype(fun(0))>;
+  return [=](auto x) mutable -> ValueType {
     int ix = (int)round(x);
     return fun(ix);
   };
 };
 
 auto LinearInterpolation = [](auto fun) {
-  using ReturnType = std::remove_reference_t<decltype(fun(0))>;
-  return [=](auto x) mutable -> ReturnType {
+  // The first two lines are here because Eigen types do
+  using ValueType = std::remove_reference_t<decltype(fun(0))>;
+  ValueType zero = ValueTraits<ValueType>::zero();
+  return [=](auto x) mutable -> ValueType {
     int ix = (int)floor(x);
     auto wx = x - ix;
 
-#warning The 0*ReturnType() is incorrect for Eigen types but it is so far the base I can do.
-    // A solution would be to define templated constexpr value Zero<Type> which
-    // would have specialization for Eigen types.
-    return (wx != 0 ? wx * fun(ix + 1) : 0 * ReturnType()) +
-           (wx != 1 ? (1 - wx) * fun(ix) : 0 * ReturnType());
+    return (wx != 0 ? wx * fun(ix + 1) : zero) +
+           (wx != 1 ? (1 - wx) * fun(ix) : zero);
 
   };
 };
